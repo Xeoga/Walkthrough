@@ -147,6 +147,7 @@ ssh2john id_rsa > id_rsa.hash
 john id_rsa.hash
 ```
 Nici un rezultat dar ne aducem aminte de credințialele care au mai fost utilizate anterior și încercăm `I_love_java` și avem succes, acces pe mașină:
+
 ![alt text](image/Dev_get_user.png)
 
 Cu comanda `sudo -l` vedem că avem aces să rulăm comanda `zip` cu privilegi de root în ajutor vine `gtfobins` cu instrucțiunea de mai jos:
