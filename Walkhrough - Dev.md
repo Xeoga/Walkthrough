@@ -152,6 +152,6 @@ Nici un rezultat dar ne aducem aminte de credințialele care au mai fost utiliza
 Cu comanda `sudo -l` vedem că avem aces să rulăm comanda `zip` cu privilegi de root în ajutor vine `gtfobins` cu instrucțiunea de mai jos:
 https://gtfobins.github.io/gtfobins/zip/#sudo
 
-![alt text](image.png)
+![alt text](image/Dev_get_root.png)
 
 Am primit root :)
